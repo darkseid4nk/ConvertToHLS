@@ -1,16 +1,11 @@
 #!/bin/bash
-
-# -c:v libx264 -profile:v high -pix_fmt yuv420p -c:a aac -ac 6 -vol 256
-
 convert_dir=$PWD
-self=${0##*/}
 dontaskagain=false
-
 for f in *; do if [[ $f = *" "* ]];then mv "$f" "${f// /_}"; fi; done
-
-for i in *.mp4 *.avi *.mkv *.m4v; do
-    file="$i"
-    echo "FILE is: $file"
+for f in *.mp4 *.avi *.mkv *.m4v; do
+    file="$f"
+    basename="$(basename "${file%.*}")"
+    output_dir=/var/www/html/movies/$basename
     file_vcodec="$(ffprobe -i $file -show_entries stream=codec_name -select_streams v:0 -of compact=p=0:nk=1 -v 0)"
     file_vprofile="$(ffprobe -i $file -show_entries stream=profile -select_streams v:0 -of compact=p=0:nk=1 -v 0)"
     file_acodec="$(ffprobe -i $file -show_entries stream=codec_name -select_streams a:0 -of compact=p=0:nk=1 -v 0)"
@@ -19,42 +14,18 @@ for i in *.mp4 *.avi *.mkv *.m4v; do
     ff_acodec="copy"
     ff_ac=""
     ff_profile=""
-
-    if [[ $file == $self ]]; then
-        echo "self detected. moving to next"
-        continue
-    fi
-
+    echo "FILE is: $file"
     echo "File acodec   : $file_acodec"
-    if [[ $file_acodec != "aac" ]]; then
-        ff_acodec="aac"
-        ff_ac="-ac 6"
-    fi
-
+    if [[ $file_acodec != "aac" ]]; then ff_acodec="aac"; ff_ac="-ac 6"; fi
     echo "File vcodec   : $file_vcodec"
-    if [[ $file_vcodec != "h264" ]]; then
-        ff_vcodec="libx264"
-    fi
-
+    if [[ $file_vcodec != "h264" ]]; then ff_vcodec="libx264"; fi
     echo "File video profile? : $file_vprofile"
-    if [ "$file_vprofile" = "High 10" ] || [ "$file_vprofile" = "Main 10" ]; then
-        ff_vcodec="libx264"
-        ff_profile="-profile:v high -pix_fmt yuv420p"
-    fi
-
+    if [ "$file_vprofile" = "High 10" ] || [ "$file_vprofile" = "Main 10" ]; then ff_vcodec="libx264"; ff_profile="-profile:v high -pix_fmt yuv420p"; fi
     echo "File achannel : $file_achannel"
-    if [[ $file_achannel == "6" ]]; then
-        ff_acodec="aac"
-        ff_ac="-ac 6"
-    fi
-
-    basename="$(basename "${file%.*}")"
-    output_dir=/var/www/html/movies/$basename
-
+    if [[ $file_achannel == "6" ]]; then ff_acodec="aac"; ff_ac="-ac 6"; fi
     echo "File directory: $output_dir"
     echo "FFMPEG MP4 cmd: ffmpeg -i $file -y -v warning -hide_banner -stats -c:v $ff_vcodec $ff_profile -c:a $ff_acodec $ff_ac -vol 256 $basename.mp4"
     echo "FFMPEG HLS cmd: ffmpeg -i $file -y -v warning -hide_banner -stats -codec: copy -hls_time 10 -hls_list_size 0 -f hls $basename.m3u8"
-
     if [ "$dontaskagain" == false ]; then
         read -p "Do you want to proceed? default Y, n moves to next in queue (Yy/Nn/Aa/exit) " yn
         case $yn in
@@ -70,7 +41,6 @@ for i in *.mp4 *.avi *.mkv *.m4v; do
             * ) echo "proceeding...";;
         esac
     fi
-
     echo "make temp dir"
     md5sum="$(md5sum $file | cut -b-32)"
     mkdir -p /tmp/$md5sum/$basename
