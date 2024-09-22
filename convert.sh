@@ -11,13 +11,10 @@ for f in *\ *; do mv "$f" "${f// /_}"; done
 for i in *.*; do
     file="$i"
     echo "FILE is: $file"
-    file_vstream="$(ffprobe -i $file 2>&1 >/dev/null | grep Stream.*Video)"
-    file_vcodec="$(echo $file_vstream | awk '{ print $4 }')"
-    file_highten=""
-    file_highten="$(echo $file_vstream | grep -e 'High 10' -e 'Main 10')"
-    file_astream="$(ffprobe -i $file 2>&1 >/dev/null | grep Stream.*Audio)"
-    file_acodec="$(echo $file_astream | awk '{ print $4 }')"
-    file_achannel="$(echo $file_astream | awk '{ print $11 }' | tr -d ,)"
+    file_vcodec="$(ffprobe -i $file -show_entries stream=codec_name -select_streams v:0 -of compact=p=0:nk=1 -v 0)"
+    file_vprofile="$(ffprobe -i $file -show_entries stream=profile -select_streams v:0 -of compact=p=0:nk=1 -v 0)"
+    file_acodec="$(ffprobe -i $file -show_entries stream=codec_name -select_streams a:0 -of compact=p=0:nk=1 -v 0)"
+    file_achannel="$(ffprobe -i $file -show_entries stream=channels -select_streams a:0 -of compact=p=0:nk=1 -v 0)"
     ff_vcodec="copy"
     ff_acodec="copy"
     ff_ac=""
@@ -39,8 +36,8 @@ for i in *.*; do
         ff_vcodec="libx264"
     fi
 
-    echo "File highten? : $file_highten"
-    if [ -n "${file_highten}" ]; then
+    echo "File video profile? : $file_vprofile"
+    if [ "$file_vprofile" = "High 10" ] || [ "$file_vprofile" = "Main 10" ]; then
         ff_vcodec="libx264"
         ff_profile="-profile:v high -pix_fmt yuv420p"
     fi
