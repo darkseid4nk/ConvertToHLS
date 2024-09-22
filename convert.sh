@@ -84,6 +84,8 @@ for i in *.*; do
     ffmpeg -i /tmp/$md5sum/"$file" \
         -y \
         -v warning -hide_banner -stats \
+        -metadata Title="$basename" \
+        -map_chapters -1 \
         -c:v $ff_vcodec \
         $ff_profile \
         -c:a $ff_acodec \
