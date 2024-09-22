@@ -20,8 +20,8 @@ for i in *.*; do
     file_achannel="$(echo $file_astream | awk '{ print $11 }' | tr -d ,)"
     ff_vcodec="copy"
     ff_acodec="copy"
-    ff_ac="-ac 6"
-    ff_profile="-profile:v high -pix_fmt yuv420p"
+    ff_ac=""
+    ff_profile=""
 
     if [[ $file == $self ]]; then
         echo "self detected. moving to next"
@@ -31,6 +31,7 @@ for i in *.*; do
     echo "File acodec   : $file_acodec"
     if [[ $file_acodec != "aac" ]]; then
         ff_acodec="aac"
+        ff_ac="-ac 6"
     fi
 
     echo "File vcodec   : $file_vcodec"
@@ -42,6 +43,12 @@ for i in *.*; do
     if [ -n "${file_highten}" ]; then
         ff_vcodec="libx264"
         ff_profile="-profile:v high -pix_fmt yuv420p"
+    fi
+
+    echo "File achannel : $file_achannel"
+    if [[ $file_achannel == "6" ]]; then
+        ff_acodec="aac"
+        ff_ac="-ac 6"
     fi
 
     basename="$(basename "${file%.*}")"
