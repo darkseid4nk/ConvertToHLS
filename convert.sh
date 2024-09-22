@@ -6,7 +6,7 @@ convert_dir=$PWD
 self=${0##*/}
 dontaskagain=false
 
-for f in *\ *; do mv "$f" "${f// /_}"; done
+for f in *; do if [[ $f = *" "* ]];then mv "$f" "${f// /_}"; fi; done
 
 for i in *.*; do
     file="$i"
