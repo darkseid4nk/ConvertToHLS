@@ -8,7 +8,7 @@ dontaskagain=false
 
 for f in *; do if [[ $f = *" "* ]];then mv "$f" "${f// /_}"; fi; done
 
-for i in *.*; do
+for i in *.mp4 *.avi *.mkv *.m4v; do
     file="$i"
     echo "FILE is: $file"
     file_vcodec="$(ffprobe -i $file -show_entries stream=codec_name -select_streams v:0 -of compact=p=0:nk=1 -v 0)"
