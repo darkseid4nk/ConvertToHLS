@@ -3,6 +3,7 @@ convert_dir=$PWD
 dontaskagain=false
 for f in *; do if [[ $f = *" "* ]];then mv "$f" "${f// /_}"; fi; done
 for f in *.mp4 *.avi *.mkv *.m4v; do
+    [ -f "$f" ] || continue
     file="$f"
     basename="$(basename "${file%.*}")"
     output_dir=/var/www/html/movies/$basename
