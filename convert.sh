@@ -15,15 +15,15 @@ for f in *.mp4 *.avi *.mkv *.m4v; do
     ff_ac=""
     ff_profile=""
     echo "FILE is: $file"
-    echo "File acodec   : $file_acodec"
+    echo "File acodec        : $file_acodec"
     if [[ $file_acodec != "aac" ]]; then ff_acodec="aac"; ff_ac="-ac 6"; fi
-    echo "File vcodec   : $file_vcodec"
+    echo "File vcodec        : $file_vcodec"
     if [[ $file_vcodec != "h264" ]]; then ff_vcodec="libx264"; fi
-    echo "File video profile? : $file_vprofile"
+    echo "File video profile : $file_vprofile"
     if [ "$file_vprofile" = "High 10" ] || [ "$file_vprofile" = "Main 10" ]; then ff_vcodec="libx264"; ff_profile="-profile:v high -pix_fmt yuv420p"; fi
-    echo "File achannel : $file_achannel"
+    echo "File achannel      : $file_achannel"
     if [[ $file_achannel == "6" ]]; then ff_acodec="aac"; ff_ac="-ac 6"; fi
-    echo "File directory: $output_dir"
+    echo "File directory     : $output_dir"
     echo "FFMPEG MP4 cmd: ffmpeg -i $file -y -v warning -hide_banner -stats -c:v $ff_vcodec $ff_profile -c:a $ff_acodec $ff_ac -vol 256 $basename.mp4"
     echo "FFMPEG HLS cmd: ffmpeg -i $file -y -v warning -hide_banner -stats -codec: copy -hls_time 10 -hls_list_size 0 -f hls $basename.m3u8"
     if [ "$dontaskagain" == false ]; then
