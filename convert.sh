@@ -91,7 +91,7 @@ for i in *.*; do
         -vol 256 \
         "$basename".mp4
     echo "creating hls"
-    ffmpeg -i "$file" \
+    ffmpeg -i "$basename".mp4 \
         -y \
         -v warning -hide_banner -stats \
         -codec: copy \
